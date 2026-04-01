@@ -3,6 +3,8 @@ import { useStore, FileNode } from '@/store'
 
 let webcontainerInstance: WebContainer | null = null
 
+export type WorkspaceSnapshot = Record<string, string>
+
 export async function bootWebContainer(): Promise<WebContainer> {
   if (webcontainerInstance) return webcontainerInstance
 
@@ -108,6 +110,8 @@ export async function listDirectory(wc: WebContainer, path: string = '/'): Promi
         })
       }
     } else {
+      // Hide internal files
+      if (entry.name === '.static-server.cjs') continue
       nodes.push({
         name: entry.name,
         path: fullPath,
@@ -145,6 +149,47 @@ export async function deleteFile(wc: WebContainer, path: string): Promise<void> 
 export async function createDirectory(wc: WebContainer, path: string): Promise<void> {
   const normalizedPath = path.startsWith('/') ? path : `/${path}`
   await wc.fs.mkdir(normalizedPath, { recursive: true })
+}
+
+export async function snapshotWorkspace(wc: WebContainer, path: string = '/'): Promise<WorkspaceSnapshot> {
+  const entries = await wc.fs.readdir(path, { withFileTypes: true })
+  const snapshot: WorkspaceSnapshot = {}
+
+  for (const entry of entries) {
+    if (entry.name === 'node_modules') continue
+
+    const fullPath = path === '/' ? `/${entry.name}` : `${path}/${entry.name}`
+
+    if (entry.isDirectory()) {
+      Object.assign(snapshot, await snapshotWorkspace(wc, fullPath))
+    } else {
+      snapshot[fullPath] = await wc.fs.readFile(fullPath, 'utf-8')
+    }
+  }
+
+  return snapshot
+}
+
+export async function restoreWorkspace(wc: WebContainer, snapshot: WorkspaceSnapshot): Promise<void> {
+  const rootEntries = await wc.fs.readdir('/', { withFileTypes: true })
+
+  for (const entry of rootEntries) {
+    if (entry.name === 'node_modules') continue
+    await wc.fs.rm(`/${entry.name}`, { recursive: true })
+  }
+
+  const paths = Object.keys(snapshot).sort((a, b) => a.localeCompare(b))
+
+  for (const path of paths) {
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`
+    const directory = normalizedPath.split('/').slice(0, -1).join('/') || '/'
+
+    if (directory !== '/') {
+      await wc.fs.mkdir(directory, { recursive: true })
+    }
+
+    await wc.fs.writeFile(normalizedPath, snapshot[path])
+  }
 }
 
 export async function spawnShell(

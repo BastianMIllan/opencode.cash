@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { 
   Terminal, Code, FileText, Zap, Globe, Lock, 
   ChevronRight, Github, Play, ArrowRight, 
@@ -9,8 +10,18 @@ import {
   Check, ExternalLink, BookOpen, Unlock, Users, GitBranch
 } from 'lucide-react'
 
+// X (Twitter) logo component
+function XLogo({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    </svg>
+  )
+}
+
 const providers = [
   { name: 'OpenAI', models: 'GPT-4o, GPT-4o-mini, o1' },
+  { name: 'Anthropic', models: 'Claude 4, Claude 3.5 Sonnet' },
   { name: 'DeepSeek', models: 'DeepSeek-V3, Coder' },
   { name: 'Google', models: 'Gemini 2.0 Flash/Pro' },
   { name: 'Groq', models: 'Llama 3.3 70B' },
@@ -176,23 +187,31 @@ export default function LandingPage() {
     <div className="min-h-screen bg-background text-foreground">
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="w-full px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-foreground flex items-center justify-center">
-              <span className="text-background font-bold text-lg">O</span>
-            </div>
+            <Image src="/logo.png" alt="OpenCode" width={40} height={40} className="rounded-xl" />
             <span className="font-semibold text-xl">OpenCode</span>
           </div>
           
           <div className="flex items-center gap-4">
             <a 
-              href="https://gitlawb.com/node/repos/z6MkqDnb/openclaude"
+              href="https://github.com/BastianMIllan/opencode.cash"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 text-muted hover:text-foreground transition-colors"
             >
               <Github className="w-5 h-5" />
               <span className="hidden sm:inline">Source</span>
+            </a>
+            
+            <a 
+              href="https://x.com/opencodecash"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-muted hover:text-foreground transition-colors"
+            >
+              <XLogo className="w-4 h-4" />
+              <span className="hidden sm:inline">@opencodecash</span>
             </a>
             
             <button
@@ -247,7 +266,7 @@ export default function LandingPage() {
               </Link>
               
               <a
-                href="https://gitlawb.com/node/repos/z6MkqDnb/openclaude"
+                href="https://github.com/BastianMIllan/opencode.cash"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 px-8 py-4 border border-border rounded-2xl font-medium text-lg hover:bg-accent transition-colors"
@@ -329,7 +348,7 @@ export default function LandingPage() {
                   <div className="text-sm text-muted mb-2">OpenClaude</div>
                   <h3 className="text-2xl font-bold mb-4">The community rebuilt it</h3>
                   <p className="text-muted leading-relaxed mb-4">
-                    The <a href="https://gitlawb.com/node/repos/z6MkqDnb/openclaude" target="_blank" rel="noopener noreferrer" className="text-foreground underline hover:no-underline">OpenClaude repository</a> emerged — 
+                    The <a href="https://github.com/BastianMIllan/opencode.cash" target="_blank" rel="noopener noreferrer" className="text-foreground underline hover:no-underline">OpenClaude repository</a> emerged — 
                     a faithful recreation of Claude Code that works with any OpenAI-compatible API. 
                     Same tools (Bash, FileRead, FileWrite, Edit, Glob, Grep), same agentic loop, 
                     same multi-step reasoning. But now you could use it with GPT-4, DeepSeek, 
@@ -366,7 +385,7 @@ export default function LandingPage() {
 
           <div className="mt-16 text-center">
             <a
-              href="https://gitlawb.com/node/repos/z6MkqDnb/openclaude"
+              href="https://github.com/BastianMIllan/opencode.cash"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-muted hover:text-foreground transition-colors"
@@ -526,13 +545,13 @@ Server running on port 3000 ✓`}</code>
                 icon: Box
               },
             ].map((item, i) => (
-              <div key={i} className="relative pt-16">
-                <div className="text-8xl font-bold text-foreground/5 absolute top-0 left-0 select-none pointer-events-none">
-                  {item.step}
-                </div>
-                <div className="relative">
-                  <div className="w-14 h-14 rounded-2xl bg-foreground flex items-center justify-center mb-6">
-                    <item.icon className="w-7 h-7 text-background" />
+              <div key={i} className="relative">
+                <div className="mb-8">
+                  <div className="flex items-end gap-4 mb-6">
+                    <span className="text-7xl font-bold text-foreground/10 leading-none">{item.step}</span>
+                    <div className="w-12 h-12 rounded-xl bg-foreground flex items-center justify-center mb-1">
+                      <item.icon className="w-6 h-6 text-background" />
+                    </div>
                   </div>
                   <h3 className="text-2xl font-semibold mb-4">{item.title}</h3>
                   <p className="text-muted">{item.description}</p>
@@ -570,7 +589,7 @@ Server running on port 3000 ✓`}</code>
             </Link>
             
             <a
-              href="https://gitlawb.com/node/repos/z6MkqDnb/openclaude"
+              href="https://github.com/BastianMIllan/opencode.cash"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-3 px-10 py-5 border border-border rounded-2xl font-medium text-lg hover:bg-accent transition-colors"
@@ -587,16 +606,14 @@ Server running on port 3000 ✓`}</code>
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-foreground flex items-center justify-center">
-                <span className="text-background font-bold text-sm">O</span>
-              </div>
+              <Image src="/logo.png" alt="OpenCode" width={32} height={32} className="rounded-lg" />
               <span className="font-medium">OpenCode</span>
             </div>
             
             <p className="text-sm text-muted text-center">
               Built on{' '}
               <a 
-                href="https://gitlawb.com/node/repos/z6MkqDnb/openclaude"
+                href="https://github.com/BastianMIllan/opencode.cash"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline hover:text-foreground"
@@ -608,7 +625,7 @@ Server running on port 3000 ✓`}</code>
             
             <div className="flex items-center gap-4">
               <a 
-                href="https://gitlawb.com/node/repos/z6MkqDnb/openclaude"
+                href="https://github.com/BastianMIllan/opencode.cash"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-muted hover:text-foreground transition-colors"

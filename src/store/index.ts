@@ -210,13 +210,29 @@ export const useStore = create<AppState>((set, get) => ({
   setShowPreview: (v) => set({ showPreview: v }),
 }))
 
+// Deprecated model migrations
+const MODEL_MIGRATIONS: Record<string, string> = {
+  'claude-3-5-haiku-20241022': 'claude-haiku-4-5',
+  'claude-3-5-haiku-latest': 'claude-haiku-4-5',
+  'claude-3-5-sonnet-20241022': 'claude-sonnet-4-6',
+  'claude-3-5-sonnet-latest': 'claude-sonnet-4-6',
+  'claude-3-7-sonnet-20250219': 'claude-sonnet-4-20250514',
+  'claude-3-opus-20240229': 'claude-opus-4-6',
+}
+
 // Load config from localStorage
 export function loadStoredConfig(): ApiConfig | null {
   if (typeof window === 'undefined') return null
   const stored = localStorage.getItem('opencode-config')
   if (!stored) return null
   try {
-    return JSON.parse(stored)
+    const config = JSON.parse(stored) as ApiConfig
+    // Migrate deprecated models
+    if (config.provider === 'anthropic' && config.model && MODEL_MIGRATIONS[config.model]) {
+      config.model = MODEL_MIGRATIONS[config.model]
+      localStorage.setItem('opencode-config', JSON.stringify(config))
+    }
+    return config
   } catch {
     return null
   }

@@ -4,8 +4,11 @@ import { useState, useRef, useEffect, KeyboardEvent } from 'react'
 import { Send, Square, RotateCcw, Trash2, Copy, Check, ChevronDown, ChevronRight, Terminal, FileText, FolderOpen, Search, Wrench, Loader2, CheckCircle, XCircle, Brain } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import Image from 'next/image'
 import { useStore, ChatMessage, ToolCallDisplay } from '@/store'
 import { Agent } from '@/lib/tools/agent'
+import { listDirectory } from '@/lib/webcontainer'
+import ModelSelector from './ModelSelector'
 
 function generateId() {
   return Math.random().toString(36).substr(2, 9)
@@ -279,6 +282,14 @@ export default function Chat() {
               })
             }
           }
+          // Refresh file tree after file-mutating tools
+          const fileMutatingTools = ['write_file', 'edit_file', 'create_directory', 'delete', 'bash']
+          if (fileMutatingTools.includes(name)) {
+            const { webcontainer: wc, setFiles } = useStore.getState()
+            if (wc) {
+              listDirectory(wc).then(tree => setFiles(tree)).catch(() => {})
+            }
+          }
         },
         onError: (err) => {
           setError(err)
@@ -312,9 +323,7 @@ export default function Chat() {
         {messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center">
             <div className="max-w-xl text-center space-y-6">
-              <div className="w-16 h-16 rounded-2xl bg-foreground flex items-center justify-center mx-auto">
-                <span className="text-background font-bold text-2xl">O</span>
-              </div>
+              <Image src="/logo.png" alt="OpenCode" width={64} height={64} className="rounded-2xl mx-auto" />
               <h1 className="text-3xl font-bold">OpenCode</h1>
               <p className="text-muted">
                 AI coding assistant with full access to your workspace.
@@ -322,12 +331,9 @@ export default function Chat() {
               </p>
               
               {!config && (
-                <button
-                  onClick={() => setIsSettingsOpen(true)}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-foreground text-background rounded-xl font-medium hover:opacity-90 transition-opacity"
-                >
-                  Add API Key to Start →
-                </button>
+                <p className="text-sm text-muted">
+                  Select a model below to get started ↓
+                </p>
               )}
               
               {config && !isReady && (
@@ -439,8 +445,10 @@ export default function Chat() {
             </button>
           </div>
           
-          <p className="text-xs text-muted text-center mt-3">
-            OpenCode uses {config?.model || 'your model'} • Tools: bash, file read/write/edit, glob, grep
+          <p className="text-xs text-muted text-center mt-3 flex items-center justify-center gap-2">
+            <ModelSelector />
+            <span className="opacity-50">•</span>
+            <span>Tools: bash, file read/write/edit, glob, grep</span>
           </p>
         </div>
       </div>

@@ -1,5 +1,7 @@
 // Tool Executor - Executes tools against WebContainer
 import { WebContainer } from '@webcontainer/api'
+import { useStore } from '@/store'
+import { tools } from './index'
 
 export interface ToolResult {
   success: boolean
@@ -10,6 +12,7 @@ export interface ToolResult {
 export class ToolExecutor {
   private wc: WebContainer
   private shellWriter: WritableStreamDefaultWriter<string> | null = null
+  private staticServerStarted = false
 
   constructor(webcontainer: WebContainer) {
     this.wc = webcontainer
@@ -17,6 +20,15 @@ export class ToolExecutor {
 
   async execute(toolName: string, args: Record<string, unknown>): Promise<ToolResult> {
     try {
+      const validationError = this.validateToolArgs(toolName, args)
+      if (validationError) {
+        return {
+          success: false,
+          output: '',
+          error: validationError
+        }
+      }
+
       switch (toolName) {
         case 'bash':
           return await this.executeBash(args.command as string, args.timeout as number)
@@ -48,6 +60,39 @@ export class ToolExecutor {
         error: error instanceof Error ? error.message : String(error)
       }
     }
+  }
+
+  private validateToolArgs(toolName: string, args: Record<string, unknown>): string | null {
+    const tool = tools.find((candidate) => candidate.name === toolName)
+    if (!tool) {
+      return `Unknown tool: ${toolName}`
+    }
+
+    const missingFields: string[] = []
+    const emptyFields: string[] = []
+
+    for (const field of tool.parameters.required) {
+      const value = args[field]
+      if (typeof value !== 'string' && typeof value !== 'number') {
+        missingFields.push(field)
+      } else if (typeof value === 'string' && value.trim() === '') {
+        emptyFields.push(field)
+      }
+    }
+
+    if (missingFields.length > 0 || emptyFields.length > 0) {
+      const problems: string[] = []
+      if (missingFields.length > 0) {
+        problems.push(`missing required argument(s): ${missingFields.join(', ')}`)
+      }
+      if (emptyFields.length > 0) {
+        problems.push(`empty argument(s): ${emptyFields.join(', ')}`)
+      }
+      const allRequired = tool.parameters.required.join(', ')
+      return `Tool ${toolName} has ${problems.join(' and ')}. Required arguments are: [${allRequired}]. You MUST provide all required arguments. Please retry the tool call with all required arguments included.`
+    }
+
+    return null
   }
 
   private async executeBash(command: string, timeout: number = 30000): Promise<ToolResult> {
@@ -141,6 +186,12 @@ export class ToolExecutor {
       await this.wc.fs.writeFile(normalizedPath, content)
       
       const lines = content.split('\n').length
+      
+      // Auto-start a static server if an HTML file was written and no server is running yet
+      if (path.endsWith('.html') && !this.staticServerStarted && !useStore.getState().previewUrl) {
+        this.startStaticServer()
+      }
+      
       return {
         success: true,
         output: `Successfully wrote ${lines} lines to ${path}`
@@ -151,6 +202,50 @@ export class ToolExecutor {
         output: '',
         error: `Failed to write file: ${error instanceof Error ? error.message : String(error)}`
       }
+    }
+  }
+
+  private async startStaticServer(): Promise<void> {
+    this.staticServerStarted = true
+    try {
+      // Write a minimal static file server
+      const serverCode = `
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
+
+const MIME = {
+  '.html': 'text/html', '.css': 'text/css', '.js': 'application/javascript',
+  '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg',
+  '.gif': 'image/gif', '.svg': 'image/svg+xml', '.ico': 'image/x-icon',
+  '.woff': 'font/woff', '.woff2': 'font/woff2', '.ttf': 'font/ttf',
+};
+
+const server = http.createServer((req, res) => {
+  let filePath = '.' + (req.url === '/' ? '/index.html' : req.url);
+  const ext = path.extname(filePath);
+  const contentType = MIME[ext] || 'application/octet-stream';
+  
+  fs.readFile(filePath, (err, data) => {
+    if (err) {
+      res.writeHead(404, { 'Content-Type': 'text/html' });
+      res.end('<h1>404 Not Found</h1>');
+      return;
+    }
+    res.writeHead(200, { 'Content-Type': contentType });
+    res.end(data);
+  });
+});
+
+server.listen(3000, () => console.log('Static server on http://localhost:3000'));
+`
+      await this.wc.fs.writeFile('/.static-server.cjs', serverCode)
+      // Spawn without awaiting — it runs in background. 
+      // The WebContainer server-ready event will trigger the preview.
+      this.wc.spawn('node', ['.static-server.cjs'])
+    } catch (e) {
+      this.staticServerStarted = false
+      console.error('Failed to start static server:', e)
     }
   }
 

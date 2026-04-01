@@ -9,3 +9,5 @@ npm-debug.log*
 .vercel
 *.tsbuildinfo
 next-env.d.ts
+
+/src/generated/prisma

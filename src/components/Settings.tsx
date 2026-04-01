@@ -23,6 +23,14 @@ const providers: Provider[] = [
     placeholder: 'sk-...',
   },
   {
+    id: 'anthropic',
+    name: 'Anthropic',
+    baseUrl: 'https://api.anthropic.com',
+    requiresKey: true,
+    models: ['claude-sonnet-4-6', 'claude-haiku-4-5', 'claude-opus-4-6', 'claude-sonnet-4-20250514', 'claude-3-haiku-20240307'],
+    placeholder: 'sk-ant-...',
+  },
+  {
     id: 'deepseek',
     name: 'DeepSeek',
     baseUrl: 'https://api.deepseek.com/v1',

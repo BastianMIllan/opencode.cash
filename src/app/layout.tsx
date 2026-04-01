@@ -1,9 +1,23 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { AuthProvider } from '@/components/AuthProvider'
 
 export const metadata: Metadata = {
-  title: 'OpenCode - Use Any LLM',
-  description: 'Use Claude Code with any LLM — OpenAI, Gemini, DeepSeek, Ollama, and 200+ models',
+  title: 'OpenCode - AI Coding Agent in Your Browser',
+  description: 'Claude Code leaked. We rebuilt it. Use the full agentic coding experience with any LLM — OpenAI, DeepSeek, Groq, Ollama, and 200+ models.',
+  metadataBase: new URL('https://opencode.cash'),
+  openGraph: {
+    title: 'OpenCode - The Agent They Didn\'t Want You to Have',
+    description: 'Claude Code leaked. We rebuilt it. Full terminal access, file editing, multi-step reasoning — with any LLM.',
+    url: 'https://opencode.cash',
+    siteName: 'OpenCode',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'OpenCode - AI Coding Agent in Your Browser',
+    description: 'Claude Code leaked. We rebuilt it. Use any LLM.',
+  },
 }
 
 export default function RootLayout({
@@ -34,7 +48,9 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   )

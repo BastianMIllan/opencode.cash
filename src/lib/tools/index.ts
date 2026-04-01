@@ -201,3 +201,12 @@ export function getOpenAITools() {
     }
   }))
 }
+
+// Convert to Anthropic tool format
+export function getAnthropicTools() {
+  return tools.map(tool => ({
+    name: tool.name,
+    description: tool.description,
+    input_schema: tool.parameters
+  }))
+}
