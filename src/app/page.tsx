@@ -187,13 +187,13 @@ export default function LandingPage() {
     <div className="min-h-screen bg-background text-foreground">
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border">
-        <div className="w-full px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Image src="/logo.png" alt="OpenCode" width={40} height={40} className="rounded-xl" />
-            <span className="font-semibold text-xl">OpenCode</span>
+        <div className="w-full px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Image src="/logo.png" alt="OpenCode" width={32} height={32} className="rounded-xl sm:w-10 sm:h-10 dark:invert-0 invert" />
+            <span className="font-semibold text-lg sm:text-xl">OpenCode</span>
           </div>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <Link
               href="/docs"
               className="flex items-center gap-2 text-muted hover:text-foreground transition-colors"
@@ -206,7 +206,7 @@ export default function LandingPage() {
               href="https://github.com/BastianMIllan/opencode.cash"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 text-muted hover:text-foreground transition-colors"
+              className="hidden sm:flex items-center gap-2 text-muted hover:text-foreground transition-colors"
             >
               <Github className="w-5 h-5" />
               <span className="hidden sm:inline">Source</span>
@@ -216,7 +216,7 @@ export default function LandingPage() {
               href="https://x.com/opencodecash"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 text-muted hover:text-foreground transition-colors"
+              className="hidden sm:flex items-center gap-2 text-muted hover:text-foreground transition-colors"
             >
               <XLogo className="w-4 h-4" />
               <span className="hidden sm:inline">@opencodecash</span>
@@ -224,16 +224,17 @@ export default function LandingPage() {
             
             <button
               onClick={toggleTheme}
-              className="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-accent transition-colors"
+              className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center hover:bg-accent transition-colors"
             >
               {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
             
             <Link
               href="/app"
-              className="flex items-center gap-2 px-5 py-2.5 bg-foreground text-background rounded-xl font-medium hover:opacity-90 transition-opacity"
+              className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 bg-foreground text-background rounded-xl text-sm sm:text-base font-medium hover:opacity-90 transition-opacity"
             >
-              Launch App
+              <span className="hidden sm:inline">Launch App</span>
+              <span className="sm:hidden">Launch</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -284,7 +285,7 @@ export default function LandingPage() {
               </a>
             </div>
             
-            <div className="flex items-center gap-6 pt-4 text-sm text-muted">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 pt-4 text-sm text-muted">
               <div className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-green-500" />
                 <span>No sign-up required</span>
@@ -614,7 +615,7 @@ Server running on port 3000 ✓`}</code>
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-3">
-              <Image src="/logo.png" alt="OpenCode" width={32} height={32} className="rounded-lg" />
+              <Image src="/logo.png" alt="OpenCode" width={32} height={32} className="rounded-lg dark:invert-0 invert" />
               <span className="font-medium">OpenCode</span>
             </div>
             

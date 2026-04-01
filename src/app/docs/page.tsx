@@ -167,7 +167,7 @@ export default function DocsPage() {
         <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-              <Image src="/logo.png" alt="OpenCode" width={32} height={32} className="rounded-lg" />
+              <Image src="/logo.png" alt="OpenCode" width={32} height={32} className="rounded-lg dark:invert-0 invert" />
               <span className="font-semibold">OpenCode</span>
             </Link>
             <span className="text-border">/</span>

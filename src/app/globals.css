@@ -56,6 +56,16 @@ body {
   background: var(--muted);
 }
 
+/* Safe area for mobile bottom tabs */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Prevent text size adjustment on orientation change */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 /* Code blocks */
 pre {
   background-color: var(--accent);

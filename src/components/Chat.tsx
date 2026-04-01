@@ -323,7 +323,7 @@ export default function Chat() {
         {messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center">
             <div className="max-w-xl text-center space-y-6">
-              <Image src="/logo.png" alt="OpenCode" width={64} height={64} className="rounded-2xl mx-auto" />
+              <Image src="/logo.png" alt="OpenCode" width={64} height={64} className="rounded-2xl mx-auto dark:invert-0 invert" />
               <h1 className="text-3xl font-bold">OpenCode</h1>
               <p className="text-muted">
                 AI coding assistant with full access to your workspace.

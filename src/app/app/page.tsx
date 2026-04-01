@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useSession, signOut } from 'next-auth/react'
-import { Settings as SettingsIcon, Github, Moon, Sun, PanelLeftClose, PanelLeft, Terminal as TerminalIcon, Loader2, AlertCircle, Play, Home, User, LogOut, Save, FolderOpen, Trash2, Download, ExternalLink, X, Plus, BookOpen } from 'lucide-react'
+import { Settings as SettingsIcon, Github, Moon, Sun, PanelLeftClose, PanelLeft, Terminal as TerminalIcon, Loader2, AlertCircle, Play, Home, User, LogOut, Save, FolderOpen, Trash2, Download, ExternalLink, X, Plus, BookOpen, MessageSquare, FileCode, Files } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -76,6 +76,7 @@ export default function AppPage() {
   const [projectError, setProjectError] = useState<string | null>(null)
   const [projectStatus, setProjectStatus] = useState<string | null>(null)
   const [activeProject, setActiveProject] = useState<{ id: string; name: string } | null>(null)
+  const [mobileTab, setMobileTab] = useState<'chat' | 'files' | 'editor' | 'terminal'>('chat')
 
   useEffect(() => {
     setMounted(true)
@@ -330,14 +331,14 @@ export default function AppPage() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-accent transition-colors"
+            className="w-8 h-8 hidden md:flex items-center justify-center rounded-lg hover:bg-accent transition-colors"
            title={sidebarCollapsed ? 'Show files' : 'Hide files'}
           >
             {sidebarCollapsed ? <PanelLeft className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
           </button>
           
           <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <Image src="/logo.png" alt="OpenCode" width={28} height={28} className="rounded-lg" />
+            <Image src="/logo.png" alt="OpenCode" width={28} height={28} className="rounded-lg dark:invert-0 invert" />
             <span className="font-semibold hidden sm:block">OpenCode</span>
           </Link>
           
@@ -375,10 +376,10 @@ export default function AppPage() {
         <div className="flex items-center gap-1">
           {/* Preview button - shows when server is running */}
           {previewUrl && (
-            <div className="flex items-center gap-1 mr-2">
+            <div className="flex items-center gap-1 mr-1 sm:mr-2">
               <button
                 onClick={() => setShowPreview(!showPreview)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-l-lg text-sm font-medium transition-all ${
+                className={`flex items-center gap-2 px-2 sm:px-3 py-1.5 rounded-l-lg text-sm font-medium transition-all ${
                   showPreview 
                     ? 'bg-green-500 text-white' 
                     : 'bg-green-500/20 text-green-500 border border-green-500/30'
@@ -386,13 +387,13 @@ export default function AppPage() {
                 title={showPreview ? 'Hide preview' : 'Show preview'}
               >
                 <Play className="w-3 h-3" />
-                Preview
+                <span className="hidden sm:inline">Preview</span>
               </button>
               <a
                 href="/preview"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center px-2 py-1.5 rounded-r-lg text-sm font-medium transition-all bg-green-500/20 text-green-500 border border-l-0 border-green-500/30 hover:bg-green-500/30"
+                className="hidden sm:flex items-center px-2 py-1.5 rounded-r-lg text-sm font-medium transition-all bg-green-500/20 text-green-500 border border-l-0 border-green-500/30 hover:bg-green-500/30"
                 title="Open full preview in new tab"
               >
                 <ExternalLink className="w-3 h-3" />
@@ -411,7 +412,7 @@ export default function AppPage() {
           
           <Link
             href="/"
-            className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-accent transition-colors"
+            className="w-8 h-8 rounded-lg hidden sm:flex items-center justify-center hover:bg-accent transition-colors"
             title="Back to home"
           >
             <Home className="w-4 h-4" />
@@ -419,7 +420,7 @@ export default function AppPage() {
 
           <Link
             href="/docs"
-            className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-accent transition-colors"
+            className="w-8 h-8 rounded-lg hidden sm:flex items-center justify-center hover:bg-accent transition-colors"
             title="Documentation"
           >
             <BookOpen className="w-4 h-4" />
@@ -429,7 +430,7 @@ export default function AppPage() {
             href="https://github.com/BastianMIllan/opencode.cash"
             target="_blank"
             rel="noopener noreferrer"
-            className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-accent transition-colors"
+            className="w-8 h-8 rounded-lg hidden sm:flex items-center justify-center hover:bg-accent transition-colors"
             title="View source"
           >
             <Github className="w-4 h-4" />
@@ -520,8 +521,8 @@ export default function AppPage() {
         </div>
       </header>
 
-      {/* Main Content */}
-      <div className="flex-1 flex overflow-hidden">
+      {/* Main Content - Desktop */}
+      <div className="flex-1 hidden md:flex overflow-hidden">
         {/* Left Sidebar - File Explorer */}
         {!sidebarCollapsed && (
           <div className="w-56 flex-shrink-0 border-r border-border flex flex-col">
@@ -580,14 +581,67 @@ export default function AppPage() {
         )}
       </div>
 
+      {/* Main Content - Mobile */}
+      <div className="flex-1 flex flex-col md:hidden overflow-hidden">
+        <div className="flex-1 overflow-hidden">
+          {mobileTab === 'chat' && <Chat />}
+          {mobileTab === 'files' && (
+            <div className="h-full flex flex-col">
+              <FileExplorer />
+              {previewUrl && (
+                <button
+                  onClick={() => setShowPreview(true)}
+                  className="mx-2 mb-2 flex items-center gap-2 px-3 py-2 rounded-lg text-sm bg-green-500/10 text-green-500 border border-green-500/20 hover:bg-green-500/20 transition-colors"
+                >
+                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                  <span className="font-medium">Preview</span>
+                  <span className="text-xs text-green-400/60 font-mono ml-auto">:{previewPort}</span>
+                </button>
+              )}
+            </div>
+          )}
+          {mobileTab === 'editor' && (
+            currentFile ? <CodeEditor /> : (
+              <div className="h-full flex items-center justify-center text-muted text-sm">
+                <p>Select a file from Files tab to edit</p>
+              </div>
+            )
+          )}
+          {mobileTab === 'terminal' && <Terminal />}
+        </div>
+
+        {/* Bottom Tab Bar */}
+        <div className="flex items-center border-t border-border bg-background safe-bottom">
+          {[
+            { id: 'chat' as const, icon: MessageSquare, label: 'Chat' },
+            { id: 'files' as const, icon: Files, label: 'Files' },
+            { id: 'editor' as const, icon: FileCode, label: 'Editor' },
+            { id: 'terminal' as const, icon: TerminalIcon, label: 'Terminal' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setMobileTab(tab.id)}
+              className={`flex-1 flex flex-col items-center gap-1 py-2.5 transition-colors ${
+                mobileTab === tab.id
+                  ? 'text-foreground'
+                  : 'text-muted'
+              }`}
+            >
+              <tab.icon className="w-5 h-5" />
+              <span className="text-[10px] font-medium">{tab.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {isProjectsOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setIsProjectsOpen(false)}
           />
-          <div className="relative w-full max-w-2xl rounded-2xl border border-border bg-background shadow-2xl">
-            <div className="flex items-center justify-between border-b border-border px-6 py-4">
+          <div className="relative w-full max-w-2xl max-h-[90vh] rounded-2xl border border-border bg-background shadow-2xl overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between border-b border-border px-4 sm:px-6 py-3 sm:py-4">
               <div>
                 <h2 className="text-lg font-semibold">My Projects</h2>
                 <p className="text-sm text-muted">
