@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useSession, signOut } from 'next-auth/react'
-import { Settings as SettingsIcon, Github, Moon, Sun, PanelLeftClose, PanelLeft, Terminal as TerminalIcon, Loader2, AlertCircle, Play, Home, User, LogOut, Save, FolderOpen, Trash2, Download, ExternalLink, X, Plus, BookOpen, MessageSquare, FileCode, Files } from 'lucide-react'
+import { Settings as SettingsIcon, Github, Moon, Sun, PanelLeftClose, PanelLeft, Terminal as TerminalIcon, Loader2, AlertCircle, Play, Home, User, LogOut, Save, FolderOpen, Trash2, Download, ExternalLink, X, Plus, BookOpen, MessageSquare, FileCode, Files, Compass, Eye, EyeOff, GitFork } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -16,6 +16,8 @@ interface SavedProject {
   id: string
   name: string
   description: string | null
+  isPublic: boolean
+  tags: string[]
   files?: WorkspaceSnapshot
   createdAt: string
   updatedAt: string
@@ -50,7 +52,7 @@ const CodeEditor = dynamic(() => import('@/components/CodeEditor'), {
 })
 
 export default function AppPage() {
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const { 
     config, setConfig, 
     isSettingsOpen, setIsSettingsOpen,
@@ -75,8 +77,9 @@ export default function AppPage() {
   const [projectsLoading, setProjectsLoading] = useState(false)
   const [projectError, setProjectError] = useState<string | null>(null)
   const [projectStatus, setProjectStatus] = useState<string | null>(null)
-  const [activeProject, setActiveProject] = useState<{ id: string; name: string } | null>(null)
+  const [activeProject, setActiveProject] = useState<{ id: string; name: string; isPublic: boolean } | null>(null)
   const [mobileTab, setMobileTab] = useState<'chat' | 'files' | 'editor' | 'terminal'>('chat')
+  const [discoveryToggling, setDiscoveryToggling] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -227,7 +230,7 @@ export default function AppPage() {
       }
 
       const saved = await response.json()
-      setActiveProject({ id: saved.id, name: saved.name })
+      setActiveProject({ id: saved.id, name: saved.name, isPublic: saved.isPublic || false })
       setProjectStatus(`Saved "${name}"`)
       setTimeout(() => setProjectStatus(null), 3000)
       await fetchProjects()
@@ -272,7 +275,7 @@ export default function AppPage() {
       setCurrentFile(null)
       setFileContent('')
       setRightPanelCollapsed(true)
-      setActiveProject({ id: project.id, name: project.name })
+      setActiveProject({ id: project.id, name: project.name, isPublic: project.isPublic || false })
       setIsProjectsOpen(false)
       setProjectStatus(`Loaded "${project.name}"`)
       setTimeout(() => setProjectStatus(null), 3000)
@@ -312,6 +315,33 @@ export default function AppPage() {
       setProjectsLoading(false)
     }
   }, [fetchProjects, activeProject])
+
+  const handleToggleDiscovery = useCallback(async () => {
+    if (!activeProject || !session) return
+    
+    setDiscoveryToggling(true)
+    try {
+      const newState = !activeProject.isPublic
+      const res = await fetch(`/api/projects/${activeProject.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isPublic: newState }),
+      })
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => null)
+        throw new Error(data?.error || 'Failed to update')
+      }
+
+      setActiveProject({ ...activeProject, isPublic: newState })
+      setProjectStatus(newState ? 'Live on Discover' : 'Removed from Discover')
+      setTimeout(() => setProjectStatus(null), 3000)
+    } catch (error) {
+      setProjectError(error instanceof Error ? error.message : 'Failed to toggle discovery')
+    } finally {
+      setDiscoveryToggling(false)
+    }
+  }, [activeProject, session])
 
   if (!mounted) {
     return (
@@ -365,6 +395,12 @@ export default function AppPage() {
                 <span className="font-medium max-w-[120px] truncate">
                   {activeProject ? activeProject.name : 'Untitled'}
                 </span>
+                {activeProject?.isPublic && (
+                  <span className="flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-green-500/20 text-green-500">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                    LIVE
+                  </span>
+                )}
               </button>
               {projectStatus && (
                 <span className="text-xs text-green-500 animate-pulse">{projectStatus}</span>
@@ -416,6 +452,14 @@ export default function AppPage() {
             title="Back to home"
           >
             <Home className="w-4 h-4" />
+          </Link>
+
+          <Link
+            href="/discover"
+            className="w-8 h-8 rounded-lg hidden sm:flex items-center justify-center hover:bg-accent transition-colors"
+            title="Discover"
+          >
+            <Compass className="w-4 h-4" />
           </Link>
 
           <Link
@@ -497,6 +541,25 @@ export default function AppPage() {
                         <FolderOpen className="w-4 h-4" />
                         My Projects
                       </button>
+                      <hr className="my-2 border-border" />
+                      {activeProject && (
+                        <button
+                          onClick={() => { setShowUserMenu(false); handleToggleDiscovery() }}
+                          disabled={discoveryToggling}
+                          className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-lg hover:bg-accent transition-colors text-left"
+                        >
+                          {activeProject.isPublic ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          {discoveryToggling ? 'Updating...' : activeProject.isPublic ? 'Hide from Discover' : 'Go Live on Discover'}
+                        </button>
+                      )}
+                      <Link
+                        href="/discover"
+                        onClick={() => setShowUserMenu(false)}
+                        className="w-full flex items-center gap-3 px-3 py-2 text-sm rounded-lg hover:bg-accent transition-colors text-left"
+                      >
+                        <Compass className="w-4 h-4" />
+                        Discover
+                      </Link>
                       <hr className="my-2 border-border" />
                       <button 
                         onClick={() => signOut()}

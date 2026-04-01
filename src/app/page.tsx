@@ -7,7 +7,7 @@ import {
   Terminal, Code, FileText, Zap, Globe, Lock, 
   ChevronRight, Github, Play, ArrowRight, 
   Sparkles, Box, Command, Cpu, Moon, Sun,
-  Check, ExternalLink, BookOpen, Unlock, Users, GitBranch
+  Check, ExternalLink, BookOpen, Unlock, Users, GitBranch, Compass
 } from 'lucide-react'
 
 // X (Twitter) logo component
@@ -195,6 +195,14 @@ export default function LandingPage() {
           
           <div className="flex items-center gap-2 sm:gap-4">
             <Link
+              href="/discover"
+              className="flex items-center gap-2 text-muted hover:text-foreground transition-colors"
+            >
+              <Compass className="w-5 h-5" />
+              <span className="hidden sm:inline">Discover</span>
+            </Link>
+
+            <Link
               href="/docs"
               className="flex items-center gap-2 text-muted hover:text-foreground transition-colors"
             >
@@ -242,7 +250,7 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
+      <section className="relative z-10 min-h-screen flex items-center justify-center pt-20 overflow-hidden">
         <AnimatedGradient />
         
         <div className="max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-12 items-center">

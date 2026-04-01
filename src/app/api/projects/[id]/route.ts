@@ -52,15 +52,23 @@ export async function PUT(
   }
 
   const body = await request.json()
-  const { name, description, files } = body
+  const { name, description, files, tags, isPublic } = body
+
+  const updateData: any = {}
+  if (name) updateData.name = name
+  if (description !== undefined) updateData.description = description
+  if (files) updateData.files = files
+  if (tags !== undefined) {
+    updateData.tags = (tags || [])
+      .slice(0, 5)
+      .map((t: string) => t.toLowerCase().trim().slice(0, 30))
+      .filter(Boolean)
+  }
+  if (isPublic !== undefined) updateData.isPublic = isPublic
 
   const project = await prisma.project.update({
     where: { id: params.id },
-    data: {
-      ...(name && { name }),
-      ...(description !== undefined && { description }),
-      ...(files && { files }),
-    },
+    data: updateData,
   })
 
   return NextResponse.json(project)

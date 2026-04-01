@@ -18,6 +18,8 @@ export async function GET() {
       id: true,
       name: true,
       description: true,
+      tags: true,
+      isPublic: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -35,17 +37,24 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json()
-  const { name, description, files } = body
+  const { name, description, files, tags, isPublic } = body
 
   if (!name) {
     return NextResponse.json({ error: 'Name is required' }, { status: 400 })
   }
 
+  const sanitizedTags = (tags || [])
+    .slice(0, 5)
+    .map((t: string) => t.toLowerCase().trim().slice(0, 30))
+    .filter(Boolean)
+
   const project = await prisma.project.create({
     data: {
       name,
       description: description || null,
+      tags: sanitizedTags,
       files: files || {},
+      isPublic: isPublic || false,
       userId: session.user.id,
     },
   })

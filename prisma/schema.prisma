@@ -48,6 +48,7 @@ model User {
   sessions      Session[]
   projects      Project[]
   apiKeys       ApiKey[]
+  likes         ProjectLike[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
@@ -64,14 +65,21 @@ model VerificationToken {
 model Project {
   id          String   @id @default(cuid())
   name        String
-  description String?
+  description String?  @db.Text
+  tags        String[] // e.g. ["react", "api", "game"]
   files       Json     // Serialized file tree
+  isPublic    Boolean  @default(false)
+  likesCount  Int      @default(0)
+  forkedFrom  String?  // ID of original project if forked
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  likes       ProjectLike[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   @@index([userId])
+  @@index([isPublic, createdAt])
+  @@index([isPublic, likesCount])
 }
 
 // API Key storage per user per provider
@@ -87,4 +95,16 @@ model ApiKey {
 
   @@unique([userId, provider])
   @@index([userId])
+}
+
+model ProjectLike {
+  id        String   @id @default(cuid())
+  userId    String
+  projectId String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, projectId])
+  @@index([projectId])
 }

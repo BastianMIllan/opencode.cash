@@ -69,18 +69,9 @@ export default function LoginPage() {
 
           <div className="mt-8 p-4 bg-accent/50 rounded-xl border border-border">
             <p className="text-sm text-muted">
-              <strong className="text-foreground">Note:</strong> You can use OpenCode without signing in. 
-              Sign in is only needed to save and sync your projects.
+              <strong className="text-foreground">Note:</strong> Sign in is required to use OpenCode. 
+              Your projects and API keys are saved to your account.
             </p>
-          </div>
-
-          <div className="mt-6 text-center">
-            <Link 
-              href="/app" 
-              className="text-sm text-muted hover:text-foreground transition-colors underline"
-            >
-              Continue without signing in
-            </Link>
           </div>
         </div>
       </main>
