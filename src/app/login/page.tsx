@@ -3,7 +3,16 @@
 import { signIn } from 'next-auth/react'
 import { useState } from 'react'
 import Link from 'next/link'
-import { Twitter, Loader2, ArrowLeft } from 'lucide-react'
+import Image from 'next/image'
+import { Loader2, ArrowLeft } from 'lucide-react'
+
+function XLogo({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+    </svg>
+  )
+}
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -30,8 +39,8 @@ export default function LoginPage() {
       <main className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-foreground flex items-center justify-center mx-auto mb-6">
-              <span className="text-background font-bold text-2xl">O</span>
+            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Image src="/logo.png" alt="OpenCode" width={64} height={64} className="rounded-2xl dark:invert-0 invert" />
             </div>
             <h1 className="text-3xl font-bold mb-2">Welcome to OpenCode</h1>
             <p className="text-muted">
@@ -48,7 +57,7 @@ export default function LoginPage() {
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
-                <Twitter className="w-5 h-5" />
+                <XLogo className="w-5 h-5" />
               )}
               Continue with X (Twitter)
             </button>
