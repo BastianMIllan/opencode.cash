@@ -437,7 +437,7 @@ export default function AppPage() {
             </div>
           )}
           
-          {!config && (
+          {session && !config && (
             <button
               onClick={() => setIsSettingsOpen(true)}
               className="flex items-center gap-2 px-3 py-1.5 bg-foreground text-background rounded-lg text-sm font-medium hover:opacity-90 transition-opacity mr-2"
@@ -488,13 +488,15 @@ export default function AppPage() {
             {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
           
-          <button
-            onClick={() => setIsSettingsOpen(true)}
-            className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-accent transition-colors"
-            title="Settings"
-          >
-            <SettingsIcon className="w-4 h-4" />
-          </button>
+          {session && (
+            <button
+              onClick={() => setIsSettingsOpen(true)}
+              className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-accent transition-colors"
+              title="Settings"
+            >
+              <SettingsIcon className="w-4 h-4" />
+            </button>
+          )}
 
           {/* User Menu */}
           {session ? (
