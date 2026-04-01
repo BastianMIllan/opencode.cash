@@ -2,15 +2,28 @@
 const nextConfig = {
   reactStrictMode: true,
   
-  // Required headers for WebContainers
+  // Required headers for WebContainers (only on /app where they're used)
   async headers() {
     return [
       {
-        source: '/:path*',
+        source: '/app',
         headers: [
           {
             key: 'Cross-Origin-Embedder-Policy',
-            value: 'require-corp',
+            value: 'credentialless',
+          },
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin',
+          },
+        ],
+      },
+      {
+        source: '/preview',
+        headers: [
+          {
+            key: 'Cross-Origin-Embedder-Policy',
+            value: 'credentialless',
           },
           {
             key: 'Cross-Origin-Opener-Policy',

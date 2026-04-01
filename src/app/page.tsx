@@ -194,6 +194,14 @@ export default function LandingPage() {
           </div>
           
           <div className="flex items-center gap-4">
+            <Link
+              href="/docs"
+              className="flex items-center gap-2 text-muted hover:text-foreground transition-colors"
+            >
+              <BookOpen className="w-5 h-5" />
+              <span className="hidden sm:inline">Docs</span>
+            </Link>
+            
             <a 
               href="https://github.com/BastianMIllan/opencode.cash"
               target="_blank"
@@ -624,6 +632,12 @@ Server running on port 3000 ✓`}</code>
             </p>
             
             <div className="flex items-center gap-4">
+              <Link
+                href="/docs"
+                className="text-muted hover:text-foreground transition-colors"
+              >
+                <BookOpen className="w-5 h-5" />
+              </Link>
               <a 
                 href="https://github.com/BastianMIllan/opencode.cash"
                 target="_blank"

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useSession, signOut } from 'next-auth/react'
-import { Settings as SettingsIcon, Github, Moon, Sun, PanelLeftClose, PanelLeft, Terminal as TerminalIcon, Loader2, AlertCircle, Play, Home, User, LogOut, Save, FolderOpen, Trash2, Download, ExternalLink, X, Plus } from 'lucide-react'
+import { Settings as SettingsIcon, Github, Moon, Sun, PanelLeftClose, PanelLeft, Terminal as TerminalIcon, Loader2, AlertCircle, Play, Home, User, LogOut, Save, FolderOpen, Trash2, Download, ExternalLink, X, Plus, BookOpen } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -415,6 +415,14 @@ export default function AppPage() {
             title="Back to home"
           >
             <Home className="w-4 h-4" />
+          </Link>
+
+          <Link
+            href="/docs"
+            className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-accent transition-colors"
+            title="Documentation"
+          >
+            <BookOpen className="w-4 h-4" />
           </Link>
           
           <a
