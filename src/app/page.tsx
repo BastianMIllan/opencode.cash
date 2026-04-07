@@ -255,9 +255,20 @@ export default function LandingPage() {
         
         <div className="max-w-7xl mx-auto px-6 py-20 grid lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-accent border border-border rounded-full text-sm">
-              <Unlock className="w-4 h-4" />
-              <span>Claude Code leaked. We rebuilt it.</span>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-accent border border-border rounded-full text-sm">
+                <Unlock className="w-4 h-4" />
+                <span>Claude Code leaked. We rebuilt it.</span>
+              </div>
+              <a
+                href="https://dexscreener.com/solana/7q2ddgbnggjrtmxgun9wxkwbtxgeb7v8adojqra5tsn"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-accent border border-border rounded-full text-sm hover:border-foreground/30 transition-colors"
+              >
+                <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                <span>Live on pump.fun</span>
+              </a>
             </div>
             
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight">
@@ -292,6 +303,10 @@ export default function LandingPage() {
                 View Source
               </a>
             </div>
+
+            <p className="text-xs text-muted font-mono break-all">
+              CA: 4KkajyB194RCumPKWT1gvssnq9be5jRLwpkJM4Zhpump
+            </p>
             
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 pt-4 text-sm text-muted">
               <div className="flex items-center gap-2">
